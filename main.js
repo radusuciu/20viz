@@ -133,10 +133,8 @@ var app = new Vue({
             }
         },
         nextSequence: function() {
-            console.log(this.sequenceIndex);
             if (this.sequenceIndex < this.dataset.sequences.length - 1) {
                 this.sequenceIndex++;
-                console.log(this.sequenceIndex, 'after');
                 this.peptideIndex = this.dataset.sequences[this.sequenceIndex].peptides.findIndex((el) => el.ratio == 20);
             }
         },
