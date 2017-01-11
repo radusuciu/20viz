@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>20viz</title>
+    <link rel="stylesheet" href="https://unpkg.com/semantic-ui@2.2.7/dist/semantic.min.css" />
+    <link rel="stylesheet" href="main.css" />
+</head>
+<body>
+    <div id="app" class="ui container">
+        <div id="input" class="ui icon large fluid input">
+            <input type="text" placeholder="Dataset URL" v-model="datasetUrl" v-on:keyup.enter="get20s" autofocus>
+            <i class="search icon"></i>
+        </div>
+
+        <template v-if="dataset.sequences.length">
+            <img class="ui fluid image" v-bind:src="getChromatogramUrl">
+
+            <div class="three ui buttons">
+                <button class="ui negative button" v-on:click="bad">
+                    <i class="remove icon"></i>
+                    Bad
+                </button>
+                <button class="ui button" v-on:click="skip">
+                    Skip
+                </button>
+                <button class="ui positive button" v-on:click="good">
+                    <i class="checkmark icon"></i>
+                    Good
+                </button>
+            </div>
+
+            <table class="ui compact table">
+                <thead>
+                    <tr>
+                        <th>{{ dataset.sequences[sequenceIndex].sequence }}</th>
+                        <th>{{ dataset.sequences[sequenceIndex].ipi }}</th>
+                        <th>{{ dataset.sequences[sequenceIndex].symbol }}</th>
+                        <th>{{ dataset.sequences[sequenceIndex].description }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-bind:class="getPeptideClass(peptide, i)" v-for="(peptide, i) in dataset.sequences[sequenceIndex].peptides">
+                        <td colspan="3">{{ peptide.sequence }}</td>
+                        <td>{{ peptide.ratio }}</td>
+                    </tr>
+                </tbody>
+                <tfoot class="full width">
+                    <tr>
+                        <th>
+                            <button class="ui button" v-on:click="previousSequence">
+                                <i class="step backward icon"></i>
+                                Previous Sequence
+                            </button>
+                        </th>
+                        <th colspan="2" class="center aligned">{{ sequenceIndex + 1 }} of {{ dataset.sequences.length }} sequences</th>
+                        <th class="right aligned">
+                            <button class="ui button" v-on:click="nextSequence">
+                                Next Sequence
+                                <i class="step forward icon"></i>
+                            </button>
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+        </template>
+    </div>
+
+    <script src="https://unpkg.com/jquery@3.1.1"></script>
+    <script src="https://unpkg.com/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://unpkg.com/semantic-ui@2.2.7/dist/semantic.min.js"></script>
+    <script src="https://unpkg.com/vue-resource@1.0.3/dist/vue-resource.min.js"></script>
+    <script src="https://unpkg.com/vue@2.1.8/dist/vue.min.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+</body>
+</html>
