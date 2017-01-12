@@ -90,13 +90,14 @@ var app = new Vue({
         datasetUrl: '',
         dataset: new SequenceDataset(),
         sequenceIndex: 0,
-        peptideIndex: 0
+        peptideIndex: -1
     },
     methods: {
         get20s: function(event) {
             this.$http.get(this.datasetUrl).then(function(response) {
                 this.dataset.initFromDta(response.data);
                 this.dataset.sequences = this.dataset.sequences.filter((sequence) => sequence.has20s());
+                this.nextPeptide();
             });
 
             event.target.blur();
