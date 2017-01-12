@@ -188,6 +188,15 @@ var app = new Vue({
             }
         });
 
+        // hijack arrow keys, prevent viewport navigation
+        const arrowEvents = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+
+        window.addEventListener('keydown', (event) => {
+            if (arrowEvents.includes(event.key)) {
+                event.preventDefault();
+            }
+        });
+
         // manually patching in touch events
         var hammer = new Hammer(this.$el);
         hammer.on('swipeleft', (event) => this.bad());
