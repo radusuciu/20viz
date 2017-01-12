@@ -82,6 +82,50 @@ class SequenceDataset {
             }
         }
     }
+
+    syncAnnotations(url) {
+        url = url.replace('.txt', '.html');
+
+        let annotationSet = {
+            file: url,
+            '_id': url,
+            annotations: []
+        };
+
+        // only look at sequences that contain 20s
+        let subset = this.sequences.filter((sequence) => sequence.has20s());
+
+        for (let sequence of subset) {
+            for (let peptide of sequence.peptides) {
+                if (peptide.annotate === false) {
+                    annotationSet.annotations.push({
+                        link: peptide.link,
+                        sequence: peptide.sequence,
+                        charge: peptide.charge,
+                        segment: peptide.segment,
+                        ipi: sequence.ipi,
+                        symbol: sequence.symbol,
+                        index: sequence.index
+                    });
+                }
+            }
+        }
+
+        // generate combined_dta.txt.annotated
+        jQuery.ajax({
+            type: 'POST',
+            url: '/cgi-bin/radu/annotate.py',
+            data: JSON.stringify(annotationSet)
+        });
+
+        // save to mongodb for persistance
+        jQuery.ajax({
+            url: '/annotate',    
+            data: {
+                'data': JSON.stringify(annotationSet)
+            }
+        });
+    }
 }
 
 var app = new Vue({
@@ -137,6 +181,8 @@ var app = new Vue({
             if (this.sequenceIndex < this.dataset.sequences.length - 1) {
                 this.sequenceIndex++;
                 this.peptideIndex = this.dataset.sequences[this.sequenceIndex].peptides.findIndex((el) => el.ratio == 20);
+            } else {
+                this.dataset.syncAnnotations(this.datasetUrl);
             }
         },
         previousPeptide: function() {
