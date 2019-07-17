@@ -131,14 +131,19 @@ class SequenceDataset {
 var app = new Vue({
     el: '#app',
     data: {
+        // this is now a newline delimited list of urts
         datasetUrl: '',
+        dataset_idx: 0,
+        datasets: [],
         dataset: new SequenceDataset(),
         sequenceIndex: 0,
         peptideIndex: -1
     },
     methods: {
         get20s: function(event) {
-            this.$http.get(this.datasetUrl).then(function(response) {
+            this.datasets = this.datasetUrl.split('\n').filter(Boolean).map(v => v.trim());
+            
+            this.$http.get(this.datasets[this.dataset_idx]).then(function(response) {
                 this.dataset.initFromDta(response.data);
                 this.dataset.sequences = this.dataset.sequences.filter((sequence) => sequence.has20s());
                 this.nextPeptide();
@@ -182,7 +187,16 @@ var app = new Vue({
                 this.sequenceIndex++;
                 this.peptideIndex = this.dataset.sequences[this.sequenceIndex].peptides.findIndex((el) => el.ratio == 20);
             } else {
-                this.dataset.syncAnnotations(this.datasetUrl);
+                this.dataset.syncAnnotations(this.datasets[this.dataset_idx]);
+
+                // If we have more datasets entered, load the next one
+                if (this.dataset_idx < this.datasets.length) {
+                    this.sequenceIndex = 0;
+                    this.peptideIndex = -1;
+                    this.dataset = new SequenceDataset();
+                    this.dataset_idx++;
+                    this.get20s();
+                }
             }
         },
         previousPeptide: function() {
@@ -210,7 +224,7 @@ var app = new Vue({
     },
     computed: {
         getChromatogramUrl: function() {
-            let split = this.datasetUrl.split('/');
+            let split = this.datasets[this.dataset_idx].split('/');
             let suffix = this.dataset.sequences[this.sequenceIndex].peptides[this.peptideIndex].src;
             split.splice(-1, 1, suffix);
             return split.join('/');
