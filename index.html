@@ -8,11 +8,12 @@
 </head>
 <body>
     <div id="app" class="ui container">
-        <div id="input" class="ui icon large fluid input">
-            <input type="text" placeholder="Dataset URL" v-model="datasetUrl" v-on:keyup.enter="get20s" autofocus>
-            <i class="search icon"></i>
+        <div id="input" class="ui form">
+            <div class="field">
+                <label>Dataset Urls</label>
+                <textarea v-model="datasetUrl" v-on:keyup.enter="get20s" autofocus></textarea>
+            </div>
         </div>
-
         <template v-if="dataset.sequences.length">
             <img class="ui fluid image" v-bind:src="getChromatogramUrl">
 
